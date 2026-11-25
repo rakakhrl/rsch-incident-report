@@ -115,7 +115,7 @@ nssm set CaptchaServerService Start SERVICE_AUTO_START
 nssm start CaptchaServerService
 ```
 
-Pastikan `VITE_CAPTCHA_URL` dan `VITE_CAPTCHA_VERIFY_URL` di berkas `.env` aplikasi menunjuk ke alamat `captcha-server` (biasanya `http://localhost:3000/challenge` dan `/verify` pada server IIS yang sama).
+Pastikan `VITE_CAPTCHA_URL` dan `VITE_CAPTCHA_VERIFY_URL` di berkas `.env` aplikasi menunjuk ke alamat `captcha-server` (biasanya `http://localhost:8800/challenge` dan `/verify` pada server IIS yang sama).
 
 ---
 
