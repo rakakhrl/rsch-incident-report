@@ -555,17 +555,42 @@ function Whistleblowing() {
               <Fieldset legend="EVIDENCE">
                 <Stack>
                   <Dropzone
+                    accept={["image/*", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".txt"]}
+                    maxSize={8 * 1024 * 1024}
                     onDrop={(files) => {
                       handleDrop(files);
                     }}
                     onReject={(files) => {
+                      const reasons = files.map((file) => {
+                        const ext = file.name
+                          .slice(file.name.lastIndexOf("."))
+                          .toLowerCase();
+                        const allowedExtensions = [
+                          ".pdf",
+                          ".doc",
+                          ".docx",
+                          ".xls",
+                          ".xlsx",
+                          ".txt",
+                        ];
+                        const isImage = file.type.startsWith("image/");
+                        const isAllowedDoc = allowedExtensions.includes(ext);
+
+                        if (!isImage && !isAllowedDoc) {
+                          return `${file.name}: tipe file tidak diizinkan (hanya gambar dan dokumen)`;
+                        }
+                        if (file.size > 8 * 1024 * 1024) {
+                          return `${file.name}: melebihi batas ukuran 8 MB`;
+                        }
+                        return `${file.name}: file ditolak`;
+                      }).join("\n");
                       showNotification({
-                        title: <Title order={5}>Files Rejected</Title>,
-                        message: <Text c="dark"></Text>,
+                        title: <Title order={5}>File Ditolak</Title>,
+                        message: <Text c="dark">{reasons}</Text>,
                         icon: (
-                          <FontAwesomeIcon icon={faCheckCircle} size="xl" />
+                          <FontAwesomeIcon icon={faXmarkCircle} size="xl" />
                         ),
-                        color: "green",
+                        color: "red",
                       });
                     }}
                   >
@@ -590,8 +615,7 @@ function Whistleblowing() {
                           Click to select files
                         </Text>
                         <Text size="sm" c="dimmed" inline mt={7}>
-                          Attach as many files as you need, file can be image,
-                          document, audio, or video.
+                          Hanya file gambar dan dokumen yang diizinkan (maks. 8 MB per file). Jika ingin mengunggah file video atau audio, silakan unggah ke layanan penyimpanan file (mis. Google Drive) lalu masukkan tautannya pada kolom Notes.
                         </Text>
                       </div>
                     </Group>
