@@ -1,0 +1,56 @@
+# ===================================================================
+# docker-compose.yml — Avicenna Incident Report (Frontend SPA)
+#
+# Cara pakai:
+#   1. Salin .env.example -> .env, lalu isi nilai VITE_* yang sesuai.
+#   2. Jalankan:  docker compose up -d --build
+#   3. Akses:     http://localhost:3000  (port sesuai PORT di .env)
+#
+# Port default 3000, dapat diubah melalui variabel PORT di berkas .env.
+# ===================================================================
+
+services:
+  avicenna-incident-report:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Variabel Vite disampaikan ke waktu build dari berkas .env host
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_API_BASE_URL_MOBILE2: ${VITE_API_BASE_URL_MOBILE2}
+        VITE_API_ACCESS_KEY: ${VITE_API_ACCESS_KEY}
+        VITE_API_ENC_METHOD: ${VITE_API_ENC_METHOD}
+        VITE_API_ACCESSKEY: ${VITE_API_ACCESSKEY}
+        VITE_API_ACCESSKEY_WHISTLEBLOWING: ${VITE_API_ACCESSKEY_WHISTLEBLOWING}
+        VITE_API_SCI_ACCESSKEY: ${VITE_API_SCI_ACCESSKEY}
+        VITE_SECRET_KEY: ${VITE_SECRET_KEY}
+        VITE_CAPTCHA_URL: ${VITE_CAPTCHA_URL}
+        VITE_CAPTCHA_VERIFY_URL: ${VITE_CAPTCHA_VERIFY_URL}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT:-3000}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-3000}/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # captcha-server adalah mikrolayanan terpisah yang berada di luar repositori ini.
+  # Uncomment dan sesuaikan jika Anda ingin menjalankannya bersama dalam satu compose.
+  #
+  # captcha-server:
+  #   image: node:20-alpine
+  #   working_dir: /app
+  #   volumes:
+  #     - ../captcha-server:/app
+  #   command: sh -c "npm ci && npm run start"
+  #   env_file:
+  #     - ../captcha-server/.env
+  #   ports:
+  #     - "3001:3000"
+  #   restart: unless-stopped
